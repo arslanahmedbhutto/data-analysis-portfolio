@@ -1,0 +1,21 @@
+name: notebooks
+
+on: [push, pull_request]
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        analysis: [01-netflix-content, 02-student-performance, 03-ecommerce-churn-audit, 04-confectionery-sales]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      # Fails the build if any cell raises an error
+      - name: Execute ${{ matrix.analysis }}
+        working-directory: ${{ matrix.analysis }}
+        run: jupyter nbconvert --to notebook --execute analysis.ipynb --output /tmp/executed.ipynb
